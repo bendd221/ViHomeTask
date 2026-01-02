@@ -1,0 +1,17 @@
+[
+  {
+    "job_name": "AverageDailyReturn", 
+    "script_name": "average_daily_returns.py",
+    "output_sub_folder": "average-daily-returns/"
+  },
+  {
+    "job_name": "HighestAverageTradedValue", 
+    "script_name": "highest_average_traded_value.py",
+    "output_sub_folder": "highest-average-traded-value/"
+  },
+  {
+    "job_name": "MostVolatileStock", 
+    "script_name": "most_volatile_stock.py",
+    "output_sub_folder": "most-volatile-stock/"
+  }
+]

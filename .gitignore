@@ -1,0 +1,56 @@
+# ----------------------------
+# Python
+# ----------------------------
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+*.pyd
+*.pyo
+
+# Virtual environments
+venv/
+.env/
+.envrc
+.venv/
+
+# Pipenv / Poetry
+Pipfile.lock
+poetry.lock
+
+# ----------------------------
+# AWS CDK / Cloud Assembly
+# ----------------------------
+**/cdk.out/
+*.stack.json
+*.template.json
+
+# ----------------------------
+# AWS Glue / PySpark / Spark
+# ----------------------------
+*.egg-info/
+*.zip
+*.jar
+*.log
+
+# AWS Glue local artifacts (if any)
+.glue_temp/
+.glue_project/
+
+# ----------------------------
+# IDEs / Editors
+# ----------------------------
+# VSCode
+.vscode/
+.history/
+
+# PyCharm
+.idea/
+*.iml
+
+# Mac / Linux
+.DS_Store
+*.swp
+*~
+*.csv

@@ -1,0 +1,43 @@
+import sys
+from awsglue.utils import getResolvedOptions
+from awsglue.context import GlueContext
+from pyspark.context import SparkContext
+
+from pyspark.sql.functions import col, avg, lag, round
+from pyspark.sql import Window
+
+args = getResolvedOptions(sys.argv, ['JOB_NAME', 'input_path', 'output_path'])
+input_path = args['input_path']
+output_path = args['output_path']
+
+sc = SparkContext()
+glueContext = GlueContext(sc)
+spark = glueContext.spark_session
+
+def load_and_preprocess(spark_session, input_path):
+    df = spark_session.read \
+    .option("header", "true") \
+    .option("inferSchema", "true") \
+    .csv(input_path)
+    return df
+
+df = load_and_preprocess(spark, input_path)
+
+df_window = Window.partitionBy("ticker").orderBy(col("Date"))
+
+df_returns = df.withColumn(
+    "lag_close", 
+    lag(col("close"), 1).over(df_window)
+).withColumn(
+    "daily_return", 
+    (col("close") / col("lag_close")) - 1
+).dropna() 
+
+final_df = df_returns.groupBy("Date").agg(
+    round(avg("daily_return") * 100, 4).alias("average_return")
+).select(
+    col("Date").alias("date"), 
+    "average_return"
+)
+
+final_df.write.mode("overwrite").partitionBy("date").parquet(output_path)
