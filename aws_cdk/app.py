@@ -1,9 +1,9 @@
 import os
-import json
+import json``
 from pathlib import Path
 from aws_cdk import App
 from stock_analytics_data_pipeline.infrastructure.data_infrastructure_stack import DataInfrastructureStack #Can be shortened using __init__.py
-from stock_analytics_api.api_infrastructure import FastAPIStack
+from stock_analytics_api.api_infrastructure import ApiStack
 from common.props import DataPipelineProps, ApiProps
 from common.config_mapper import GlueJobConfig
 
@@ -31,5 +31,5 @@ api_props = ApiProps(
 )
 
 DataInfrastructureStack(app, "StockAnalyticsPipelineStack", data_pipeline_props)
-FastAPIStack(app, "StockAnalyticsAPIStack", api_props)
+ApiStack(app, "StockAnalyticsAPIStack", api_props)
 app.synth()

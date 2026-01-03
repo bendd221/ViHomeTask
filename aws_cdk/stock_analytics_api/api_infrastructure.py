@@ -9,7 +9,7 @@ from aws_cdk import (
 from constructs import Construct
 from common.props import ApiProps
 
-class FastAPIStack(Stack):
+class ApiStack(Stack):
     def __init__(self, scope: Construct, id: str, props: ApiProps, **kwargs) -> None:
         super().__init__(scope, id, **kwargs)
         vpc = ec2.Vpc(self, "ApiVpc", max_azs=2)
