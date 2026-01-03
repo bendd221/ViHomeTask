@@ -7,7 +7,7 @@ from aws_cdk.aws_s3_assets import Asset
 from dataclasses import dataclass
 from typing import Optional
 from constructs import Construct
-from ..constants import GLUE_VERSION, GLUE_JOBS_TOP_LEVEL_PREFIX
+from ...constants import GLUE_VERSION, GLUE_JOBS_TOP_LEVEL_PREFIX
 
 @dataclass
 class GlueJobProps:

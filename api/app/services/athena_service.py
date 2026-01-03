@@ -1,0 +1,66 @@
+import asyncio
+import aioboto3
+from typing import List, Dict
+from config import settings
+
+class AsyncAthenaService:
+    def __init__(self):
+        self.session = aioboto3.Session()
+        self.region = settings.aws_region
+        self.database = settings.athena_database
+        self.output_location = settings.athena_output_location
+
+    async def execute(self, query: str) -> List[Dict]:
+        # Use an async context manager for the client
+        async with self.session.client("athena", region_name=self.region) as client:
+            print(query)
+            response = await client.start_query_execution(
+                QueryString=query,
+                QueryExecutionContext={"Catalog": "AWSDataCatalog", "Database": self.database},
+                ResultConfiguration={"OutputLocation": self.output_location},
+            )
+
+            query_id = response["QueryExecutionId"]
+            await self._wait(client, query_id)
+            return await self._results(client, query_id)
+
+    async def _wait(self, client, query_id: str) -> None:
+        state = "RUNNING"
+        max_executions = 20
+        while max_executions > 0 and state in ["RUNNING", "QUEUED"]:
+            max_executions -= 1
+            # Await the AWS call
+            status = await client.get_query_execution(QueryExecutionId=query_id)
+            state = status["QueryExecution"]["Status"]["State"]
+
+            if state == "SUCCEEDED":
+                return
+            if state in ("FAILED", "CANCELLED"):
+                 # Simplified error message for clarity in the example
+                raise RuntimeError(f"""
+                    Athena query failed in state: {state}
+                    Information: {status["QueryExecution"]["Status"]["AthenaError"]["ErrorMessage"]}
+                """)
+
+            # Use asyncio.sleep instead of time.sleep
+            await asyncio.sleep(0.5)
+
+    async def _results(self, client, query_id: str) -> List[Dict]:
+        # Use the async paginator from aioboto3
+        paginator = client.get_paginator("get_query_results")
+
+        headers = None
+        results = []
+
+        # Iterate through the async pages
+        async for page in paginator.paginate(QueryExecutionId=query_id):
+            rows = page["ResultSet"]["Rows"]
+            # ... (rest of the logic remains synchronous Python list/dict manipulation) ...
+            if headers is None:
+                headers = [col["VarCharValue"] for col in rows[0]["Data"]]
+                rows = rows[1:]
+
+            for row in rows:
+                values = [col.get("VarCharValue") for col in row["Data"]]
+                results.append(dict(zip(headers, values)))
+        return results

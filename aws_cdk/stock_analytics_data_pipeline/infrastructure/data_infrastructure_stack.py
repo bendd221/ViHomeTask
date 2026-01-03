@@ -10,10 +10,10 @@ from aws_cdk import (
 from constructs import Construct
 from pathlib import Path
 from .components.glue_job_definition import GlueJobDefinition, GlueJobProps
-from .constants import BUCKET_NAME, LOCAL_INPUT_DATA, S3_INPUT_PREFIX, GLUE_JOBS_CONFIG_FILE, GLUE_JOBS_SCRIPT_FOLDER_PATH
+from ..constants import BUCKET_NAME, LOCAL_INPUT_DATA, S3_INPUT_PREFIX, GLUE_JOBS_CONFIG_FILE, GLUE_JOBS_SCRIPT_FOLDER_PATH
 
 
-class InfrastructureStack(Stack):
+class DataInfrastructureStack(Stack):
     def __init__(self, scope: Construct, id: str, **kwargs) -> None:
         super().__init__(scope, id, **kwargs)
 

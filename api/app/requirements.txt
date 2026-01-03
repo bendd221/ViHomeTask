@@ -1,0 +1,5 @@
+fastapi
+uvicorn[standard]
+pydantic>1
+aioboto3
+pydantic-settings
