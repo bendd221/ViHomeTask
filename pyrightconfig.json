@@ -1,0 +1,16 @@
+{
+    "include": [
+        "."
+    ],
+    "exclude": [
+        "**/node_modules",
+        "**/cdk.out",
+        "**/.venv",
+        "**/.pytest_cache",
+        "**/__pycache__",
+        "stock_analytics_data_pipeline/local_source_data/" 
+    ],
+    "reportMissingImports": true,
+    "pythonVersion": "3.9", 
+    "pythonPlatform": "Windows"
+}

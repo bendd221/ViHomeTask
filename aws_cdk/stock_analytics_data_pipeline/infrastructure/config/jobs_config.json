@@ -2,19 +2,19 @@
   {
     "job_name": "AverageDailyReturn", 
     "script_name": "average_daily_returns.py",
-    "output_sub_folder": "average-daily-returns/",
+    "output_sub_folder": "results/average-daily-returns/",
     "glue_version": "5.0"
   },
   {
     "job_name": "HighestAverageTradedValue", 
     "script_name": "highest_average_traded_value.py",
-    "output_sub_folder": "highest-average-traded-value/",
+    "output_sub_folder": "results/highest-average-traded-value/",
     "glue_version": "5.0"
   },
   {
     "job_name": "MostVolatileStock", 
     "script_name": "most_volatile_stock.py",
-    "output_sub_folder": "most-volatile-stock/",
+    "output_sub_folder": "results/most-volatile-stock/",
     "glue_version": "5.0"
   }
 ]
