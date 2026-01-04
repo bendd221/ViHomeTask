@@ -1,5 +1,6 @@
 import asyncio
 import aioboto3
+from loguru import logger
 from typing import List, Dict
 from config import settings
 
@@ -13,7 +14,7 @@ class AsyncAthenaService:
     async def execute(self, query: str) -> List[Dict]:
         # Use an async context manager for the client
         async with self.session.client("athena", region_name=self.region) as client:
-            print(query)
+            logger.debug(f"Starting Athena Query Execution, query = {query}")
             response = await client.start_query_execution(
                 QueryString=query,
                 QueryExecutionContext={"Catalog": "AWSDataCatalog", "Database": self.database},
@@ -21,6 +22,7 @@ class AsyncAthenaService:
             )
 
             query_id = response["QueryExecutionId"]
+            logger.debug(f"query_id = {query_id}")
             await self._wait(client, query_id)
             return await self._results(client, query_id)
 
@@ -58,4 +60,6 @@ class AsyncAthenaService:
             for row in rows:
                 values = [col.get("VarCharValue") for col in row["Data"]]
                 results.append(dict(zip(headers, values)))
+        
+        logger.debug(f"Query {query_id} finished, returning data.")
         return results
