@@ -11,6 +11,7 @@ GLUE_JOBS_CONFIG_FILE = 'stock_analytics_data_pipeline/infrastructure/config/job
 BUCKET_NAME = "data-engineer-assignment-ben-dadon"
 DATABASE_NAME = "assignment_ben"
 LOCAL_INPUT_DATA='stock_analytics_data_pipeline/local_source_data/'
+
 app = App()
 
 logger.info('Starting prop initialization')

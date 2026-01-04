@@ -100,13 +100,31 @@ Prerequisites:
 
 Install dependencies:
 
+  Creating a python environment - highly recommended, for more information: https://docs.python.org/3/library/venv.html
+
   pip install -r api/app/requirements.txt #For the application itself
 
   pip install -r aws_cdk/requirements.txt #For the CDK Scripts
 
+
 Bootstrap CDK (once per account/region):
 
   cdk bootstrap
+
+Modify cdk.json:
+
+cdk.json includes an aws profile spec, can remove it if your keys are stored in the default profile, otherwise, don't forget to change the profile name.
+can also use aws configure `--profile <PROFILENAME>` to create a new profile, if needed.
+
+Example cdk.json:
+{
+  "app": "py app.py",
+  "profile": "vi"
+}
+
+Create and populate the data folder:
+LOCAL_INPUT_DATA variable at the top of aws_cdk/app.py pre-defines a relative path to a data folder.
+Feel free to modify the path or use the same one, then copy the sample/input data (stocks_data.csv in this case)
 
 Deploy stacks
 
@@ -120,14 +138,7 @@ Or deploy individually:
 
   cdk deploy StockAnalyticsApiStack
 
-cdk.json includes an aws profile spec, can remove it if your keys are stored in the default profile, otherwise, don't forget to change the profile name.
-can also use aws configure `--profile <PROFILENAME>` to create a new profile, if needed.
 
-Example cdk.json:
-{
-  "app": "py app.py",
-  "profile": "vi"
-}
 --------------------------
 Local Development
 --------------------------
@@ -139,31 +150,24 @@ Run FastAPI locally:
   uvicorn main:app --reload
 
 - Java SDK 17+ for PySpark 4.0.1 or else the session creation hangs
---------------------------
-Configuration
---------------------------
-
-  CDK props are defined through app.py, and can be moved to environment variables if needed (Please make sure to not use any inside the Stacks/Constructs themselves and only pass them through the highest layer app.py)
-
-  api/app/config.py is what the API needs to function, can use python-dotenv and a .env file to locally work and imitate env variables.
 
 --------------------------
 Usage
 --------------------------
 
-After deploying the CDK, you should see the following message with the load balancer's endpoint:
+After deploying the CDK, you should see the following message in your CLI, with the load balancer's endpoint:
 
   Outputs:
 
   ```
   StockAnalyticsAPIStack.LoadBalancerDNS = StockA-Stock-myexample-test.eu-central-1.elb.amazonaws.com
   StockAnalyticsAPIStack.StocksAnalyticsApiLoadBalancerDNSF698D36A = StockA-Stock-myexample-test.eu-central-1.elb.amazonaws.com
-  StockAnalyticsAPIStack.StocksAnalyticsApiServiceURL6F11E8A2 = http://StockA-Stock-myexample-test.eu-central-1.elb.amazonaws.com
+  **StockAnalyticsAPIStack.StocksAnalyticsApiServiceURL6F11E8A2 = http://StockA-Stock-myexample-test.eu-central-1.elb.amazonaws.com**
   Stack ARN:
   arn:aws:cloudformation:eu-central-1:myaccount:stack/StockAnalyticsAPIStack/irrelevnant
   ```
 
-Use the DNS to send api requests for data:
+Use the DNS url to send api requests:
 
 ```python
   import requests
@@ -179,7 +183,7 @@ Available endpoints:
 
   /average-daily-return?from_date=YYYY-MM-DD&to_date=YYYY-MM-DD 
 
-  /health
+  /health (here for health checks by the load balancer)
 
 --------------------------
 Notes
