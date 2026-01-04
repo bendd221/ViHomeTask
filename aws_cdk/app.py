@@ -10,7 +10,7 @@ from common.config_mapper import GlueJobConfig
 GLUE_JOBS_CONFIG_FILE = 'stock_analytics_data_pipeline/infrastructure/config/jobs_config.json'
 BUCKET_NAME = "data-engineer-assignment-ben-dadon"
 DATABASE_NAME = "assignment_ben"
-
+LOCAL_INPUT_DATA='stock_analytics_data_pipeline/local_source_data/'
 app = App()
 
 logger.info('Starting prop initialization')
@@ -22,7 +22,7 @@ logger.debug('Constructing DataPipelineProps')
 data_pipeline_props = DataPipelineProps(
     bucket_name=BUCKET_NAME,
     database_name=DATABASE_NAME,
-    local_input_data='stock_analytics_data_pipeline/local_source_data/',
+    local_input_data=LOCAL_INPUT_DATA,
     s3_input_prefix='raw-input/stock_data/',
     glue_jobs_script_folder_path='stock_analytics_data_pipeline/runtime/glue_scripts/',
     glue_config_data=[GlueJobConfig.model_validate(job) for job in job_config_dict],
