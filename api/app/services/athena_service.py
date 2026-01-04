@@ -12,7 +12,6 @@ class AsyncAthenaService:
         self.output_location = settings.athena_output_location
 
     async def execute(self, query: str) -> List[Dict]:
-        # Use an async context manager for the client
         async with self.session.client("athena", region_name=self.region) as client:
             logger.debug(f"Starting Athena Query Execution, query = {query}")
             response = await client.start_query_execution(

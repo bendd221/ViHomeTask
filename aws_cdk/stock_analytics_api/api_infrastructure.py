@@ -38,7 +38,7 @@ class ApiStack(Stack):
             ),
             public_load_balancer=True,
         )
-        
+
         logger.debug('Configuring ALB health check path to /health')
         self.service.target_group.configure_health_check(
             path="/health"
@@ -57,7 +57,3 @@ class ApiStack(Stack):
             value=self.service.load_balancer.load_balancer_dns_name,
             description=f"Use this URL for API requests. (e.g. http://load_balancer_dns/most_volatile)"
         )
-        # self.service.load_balancer.connections.allow_from_any_ipv4(
-        #     ec2.Port.tcp(8000),
-        #     "Allow access to the application port 8000"
-        # )
