@@ -189,4 +189,5 @@ Future Improvements
 
   - Tests (Didn't have time and would rather not just blindly generate them with AI)
   - Improve observability (logs, metrics are lacking here)
+  - Error handling
   - Boilerplate code of glue job scripts into a separate module (--additional-python-modules)

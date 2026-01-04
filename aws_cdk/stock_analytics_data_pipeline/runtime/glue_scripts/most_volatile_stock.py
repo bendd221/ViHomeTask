@@ -1,4 +1,5 @@
 import sys
+import logging
 from awsglue.utils import getResolvedOptions
 from awsglue.context import GlueContext
 from pyspark.context import SparkContext
@@ -14,8 +15,12 @@ sc = SparkContext()
 glueContext = GlueContext(sc)
 spark = glueContext.spark_session
 
-# Minimal Glue logging
-logger = glueContext.get_logger()
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s"
+)
+
+logger = logging.getLogger(__name__)
 logger.info(f"Job {args['JOB_NAME']} started")
 logger.info(f"Input path: {input_path}, Output path: {output_path}, Database: {database_name}")
 
