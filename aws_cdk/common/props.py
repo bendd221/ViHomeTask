@@ -11,6 +11,7 @@ class DataPipelineProps:
     local_input_data: str
     s3_input_prefix: str
     glue_jobs_script_folder_path: str
+    database_name: str
     glue_config_data: list[GlueJobConfig]
 
 @dataclass(frozen=True)

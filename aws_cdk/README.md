@@ -1,149 +1,181 @@
 📈 Stock Analytics Platform (AWS CDK + FastAPI)
+
+==========================
 Overview
+==========================
 
 This project provisions a scalable analytics platform on AWS using AWS CDK.
 It consists of two main stacks:
 
-Data Pipeline Stack
-Provisions AWS Glue jobs responsible for ingesting and transforming stock market data.
+  - Data Pipeline Stack
+      Provisions AWS Glue jobs responsible for ingesting and transforming stock market data.
 
-API Stack
-Provisions an API backed by FastAPI, exposing processed analytics data to consumers.
+  - API Stack
+      Provisions an API backed by FastAPI, exposing processed analytics data to consumers.
 
 The infrastructure is defined using AWS CDK, while the API application logic lives separately.
 
+--------------------------
 Architecture
+--------------------------
 
 High-level flow:
 
-Stocks data pipeline is generated through the CDK to create either one or multiple glue jobs (depends on the requirements)
-A simple API with four endpoints (healths + three metrics) is generated through a different CDK stack.
-Tables in AWS Data Catalog are currently created manually, but can also be generated using a Crawler or Partition Projection (Hopefully I got to implementing it)
-Then after the glue jobs are finished,the API is used to query Athena return data to the consumer.
-.
-├── api/
-│   └── app/
-│       ├── routers/          # FastAPI route definitions (health + metrics)
-│       ├── services/         # Currently, only AthenaService to abstract some of the logic
-│       ├── __init__.py
-│       ├── config.py         # FastAPI and AWS Config data.
-│       ├── main.py           # FastAPI entry point
-│       ├── Dockerfile        # API container definition (Python 3.9)
-│       └── requirements.txt  # API dependencies
-│
-├── aws_cdk/
-│   ├── common/               # Shared CDK constructs/utilities, mainly props of each stack and a config mapper.
-│   │
-│   ├── stock_analytics_api/
-│   │   └── api_infrastructure.py
-│   │       # CDK stack for the API (ECS using L3 FarGateService + S3 Permissions)
-│   │
-│   └── stock_analytics_data_pipeline/
-│       ├── infrastructure/   # Glue jobs, roles, S3, etc.
-│       ├── local_source_data/# Sample/local input data
-│       └── runtime/          # Glue job scripts
-│
-├── app.py                    # CDK app entry point
-├── cdk.json                  # CDK configuration
-├── README.md # hi
-└── .gitignore
+  1. Stocks data pipeline is generated through the CDK to create either one or multiple glue jobs (depends on the requirements)
+  2. A simple API with four endpoints (healths + three metrics) is generated through a different CDK stack.
+  3. Tables in AWS Data Catalog are currently created manually, but can also be generated using a Crawler or Partition Projection (Hopefully I got to implementing it)
+  4. Then after the glue jobs are finished,the API is used to query Athena return data to the consumer.
 
+Project structure:
+
+    .
+    ├── api/
+    │   └── app/
+    │       ├── routers/          # FastAPI route definitions (health + metrics)
+    │       ├── services/         # Currently, only AthenaService to abstract some of the logic
+    │       ├── __init__.py
+    │       ├── config.py         # FastAPI and AWS Config data.
+    │       ├── main.py           # FastAPI entry point
+    │       ├── Dockerfile        # API container definition (Python 3.9)
+    │       └── requirements.txt  # API dependencies
+    │
+    ├── aws_cdk/
+    │   ├── common/               # Shared CDK constructs/utilities, mainly props of each stack and a config mapper.
+    │   ├── stock_analytics_api/
+    │   │   └── api_infrastructure.py
+    │   │       # CDK stack for the API (ECS using L3 FarGateService + S3 Permissions)
+    │   └── stock_analytics_data_pipeline/
+    │       ├── infrastructure/   # Glue jobs, roles, S3, etc.
+    │       ├── local_source_data/# Sample/local input data
+    │       └── runtime/          # Glue job scripts
+    │
+    ├── app.py                    # CDK app entry point
+    ├── cdk.json                  # CDK configuration
+    ├── README.md # hi
+    └── .gitignore
+
+--------------------------
 Stacks
+--------------------------
+
 1. Data Pipeline Stack
 
 Purpose:
 
-Dynamically provision AWS Glue jobs
-
-Manage IAM roles and permissions
-
-Define data storage layout (e.g. S3 prefixes, bucket creation)
+  - Dynamically provision AWS Glue jobs
+  - Manage IAM roles and permissions
+  - Define data storage layout (e.g. S3 prefixes, bucket creation)
 
 Location:
-aws_cdk/stock_analytics_data_pipeline/
-
+  aws_cdk/stock_analytics_data_pipeline/
 
 2. API Stack
 
 Purpose:
 
-Deploy infrastructure required to run the API
-
-Grant permissions to the API for athena data access
+  - Deploy infrastructure required to run the API
+  - Grant permissions to the API for athena data access
 
 Location:
+  aws_cdk/stock_analytics_api/
 
-aws_cdk/stock_analytics_api/
-
-
+--------------------------
 FastAPI Application
+--------------------------
 
 The API implementation lives outside the CDK stacks and is deployed as an application through ApiStack.
 
 Location:
+  api/app/
 
-api/app/
-
-
+--------------------------
 Deployment
+--------------------------
 
 Prerequisites:
 
-Python 3.9+
+  - Python 3.9+
+  - AWS CLI configured
+  - AWS CDK installed
+  - Docker (for API container builds)
+  - Java 17+ for PySpark 4.0.1
 
-AWS CLI configured
+Install dependencies:
 
-AWS CDK installed
+  pip install -r api/app/requirements.txt #For the application itself
+  pip install -r aws_cdk/requirements.txt #For the CDK Scripts
 
-Docker (for API container builds)
+Bootstrap CDK (once per account/region):
 
-Java 17+ for PySpark 4.0.1
-
-Install dependencies
-pip install -r api/app/requirements.txt #For the application itself
-pip install -r aws_cdk/requirements.txt #For the CDK Scripts
-
-Bootstrap CDK (once per account/region)
-cdk bootstrap
+  cdk bootstrap
 
 Deploy stacks
 
 Deploy both stacks:
 
-cdk deploy --all
-
+  cdk deploy --all
 
 Or deploy individually:
 
-cdk deploy StockAnalyticsDataPipelineStack
-cdk deploy StockAnalyticsApiStack
+  cdk deploy StockAnalyticsDataPipelineStack
+  cdk deploy StockAnalyticsApiStack
 
+--------------------------
 Local Development
-Run FastAPI locally
-cd api/app
-uvicorn main:app --reload
+--------------------------
 
+Run FastAPI locally:
+
+  cd api/app
+  uvicorn main:app --reload
+
+--------------------------
 Configuration
+--------------------------
 
-CDK props are defined through app.py, and can be moved to environment variables if needed (Please make sure to not use any inside the Stacks/Constructs themselves and only pass them through the highest layer app.py)
+  CDK props are defined through app.py, and can be moved to environment variables if needed (Please make sure to not use any inside the Stacks/Constructs themselves and only pass them through the highest layer app.py)
 
-api/app/config.py is what the API needs to function, can use python-dotenv and a .env file to locally work and imitate env variables.
+  api/app/config.py is what the API needs to function, can use python-dotenv and a .env file to locally work and imitate env variables.
 
-Notes!
+--------------------------
+Usage
+--------------------------
 
-Infrastructure and application code are intentionally separated.
+After deploying the CDK, you should see the following message with the load balancer's endpoint:
 
-Glue jobs are currently split into three but the I/O Concern is something I had in mind, so one glue job that does all three might be the correct approach depending on the demand (Time, Scalability, Organization etc)
+  Outputs:
+  StockAnalyticsAPIStack.LoadBalancerDNS = StockA-Stock-myexample-test.eu-central-1.elb.amazonaws.com
+  StockAnalyticsAPIStack.StocksAnalyticsApiLoadBalancerDNSF698D36A = StockA-Stock-myexample-test.eu-central-1.elb.amazonaws.com
+  StockAnalyticsAPIStack.StocksAnalyticsApiServiceURL6F11E8A2 = http://StockA-Stock-myexample-test.eu-central-1.elb.amazonaws.com
+  Stack ARN:
+  arn:aws:cloudformation:eu-central-1:851725552187:stack/StockAnalyticsAPIStack/7c58aa30-e901-11f0-acd2-0aa6a2f17871
 
-Schemas are currently being defined manually, but we can use partition projection to pre-determine the tables.
+Use the DNS to send api requests for data:
 
-Annualize Volatility is one of the column names, but the task itself required data from all years, was that a mistake on the task itself?
+  import requests
+  results = requests.get(http://StockA-Stock-myexample-test.eu-central-1.elb.amazonaws.com/metrics/most-valuable-day)
 
-AWS Lambda was a consideration at first (for the API) but I have decided to go with ECS as Lambda has a 15 minutes response timeout, and if the data scales more it might become a problem at one point.
+Available endpoints:
 
-One of the results have a single line it in, and Athenas has a minimum pay per request, so even if something is being queried for a single byte it will still charge for a lot more, maybe there's a better solution to that?
+  /most-valueble-day
+  /most-volatile
+  /average-daily-return
+  /health
 
+--------------------------
+Notes
+--------------------------
+
+  - Infrastructure and application code are intentionally separated.
+  - Glue jobs are currently split into three but the I/O Concern is something I had in mind, so one glue job that does all three might be the correct approach depending on the demand (Time, Scalability, Organization etc)
+  - Schemas are currently being defined manually, but we can use partition projection to pre-determine the tables.
+  - Annualize Volatility is one of the column names, but the task itself required data from all years, was that a mistake on the task itself?
+  - AWS Lambda was a consideration at first (for the API) but I have decided to go with ECS as Lambda has a 15 minutes response timeout, and if the data scales more it might become a problem at one point.
+  - One of the results have a single line it in, and Athenas has a minimum pay per request, so even if something is being queried for a single byte it will still charge for a lot more, maybe there's a better solution to that?
+
+--------------------------
 Future Improvements
+--------------------------
 
-Tests (Didn't have time and would rather not just blindly generate them with AI)
-Improve observability (logs, metrics are lacking here)
+  - Tests (Didn't have time and would rather not just blindly generate them with AI)
+  - Improve observability (logs, metrics are lacking here)

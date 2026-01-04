@@ -6,9 +6,10 @@ from pyspark.context import SparkContext
 from pyspark.sql.functions import col, avg
 from pyspark.sql import Window
 
-args = getResolvedOptions(sys.argv, ['JOB_NAME', 'input_path', 'output_path'])
-input_path = args['input_path']
-output_path = args['output_path']
+args = getResolvedOptions(sys.argv, ['JOB_NAME', 'INPUT_PATH', 'OUTPUT_PATH', 'DATABASE_NAME'])
+input_path = args['INPUT_PATH']
+output_path = args['OUTPUT_PATH']
+database_name = args['DATABASE_NAME']
 
 sc = SparkContext()
 glueContext = GlueContext(sc)
@@ -34,4 +35,10 @@ highest_value_day_df = df_daily_avg.orderBy(
 ).limit(1)
 
 final_df = highest_value_day_df.select("Date", "average_traded_value").withColumnRenamed("Date", "date")
-final_df.coalesce(1).write.mode("overwrite").parquet(output_path)
+
+final_df.coalesce(1).write \
+    .mode("overwrite") \
+    .format("parquet") \
+    .option("path", output_path) \
+    .saveAsTable(f"{database_name}.highest_average_traded_value")
+

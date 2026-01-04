@@ -29,7 +29,7 @@ async def daily_average_return(
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.get("/highest-average-traded-value-day")
+@router.get("/most-valuable-day")
 async def highest_average_traded_value_day():
     return await athena_service.execute("""
         SELECT * from highest_average_traded_value
@@ -37,7 +37,7 @@ async def highest_average_traded_value_day():
     )
 
 
-@router.get("/most-volatile-stock")
+@router.get("/most-volatile")
 async def most_volatile_stock():
     return await athena_service.execute("""
         SELECT * from most_volatile_stock

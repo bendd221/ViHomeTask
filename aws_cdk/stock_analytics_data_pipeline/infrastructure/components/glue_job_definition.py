@@ -11,6 +11,7 @@ from constructs import Construct
 @dataclass
 class GlueJobProps:
     job_name: str
+    database_name: str
     script_path: str
     s3_input_prefix: str
     s3_output_prefix: str
@@ -40,7 +41,7 @@ class GlueJobDefinition(Construct):
 
         self.script_asset.grant_read(self.glue_job_role)
         props.data_bucket.grant_read(self.glue_job_role)
-        props.data_bucket.grant_read_write(self.glue_job_role, f"{props.s3_output_prefix}/*")
+        props.data_bucket.grant_write(self.glue_job_role, f"{props.s3_output_prefix}/*")
 
         full_input_path_arg = f"s3a://{props.data_bucket.bucket_name}/{props.s3_input_prefix}"
         full_output_path_arg = f"s3a://{props.data_bucket.bucket_name}/{props.s3_output_prefix}/"
@@ -56,8 +57,10 @@ class GlueJobDefinition(Construct):
                 python_version="3"
             ),
             default_arguments={
-                "--input_path": full_input_path_arg,
-                "--output_path": full_output_path_arg 
+                "--INPUT_PATH": full_input_path_arg,
+                "--OUTPUT_PATH": full_output_path_arg,
+                "--enable-glue-datacatalog": True,
+                "--DATABASE_NAME": props.database_name
             },
             worker_type=props.worker_type,
             number_of_workers=props.number_of_workers,

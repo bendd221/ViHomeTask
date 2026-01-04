@@ -6,9 +6,10 @@ from pyspark.context import SparkContext
 from pyspark.sql.functions import col, avg, lag, round
 from pyspark.sql import Window
 
-args = getResolvedOptions(sys.argv, ['JOB_NAME', 'input_path', 'output_path'])
-input_path = args['input_path']
-output_path = args['output_path']
+args = getResolvedOptions(sys.argv, ['JOB_NAME', 'INPUT_PATH', 'OUTPUT_PATH', 'DATABASE_NAME'])
+input_path = args['INPUT_PATH']
+output_path = args['OUTPUT_PATH']
+database_name = args['DATABASE_NAME']
 
 sc = SparkContext()
 glueContext = GlueContext(sc)
@@ -40,4 +41,9 @@ final_df = df_returns.groupBy("Date").agg(
     "average_return"
 )
 
-final_df.write.mode("overwrite").partitionBy("date").parquet(output_path)
+final_df.write \
+    .mode("overwrite") \
+    .format("parquet") \
+    .partitionBy("date") \
+    .option("path", output_path) \
+    .saveAsTable(f"{database_name}.average_daily_return")

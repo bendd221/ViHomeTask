@@ -1,5 +1,7 @@
-fastapi
-uvicorn[standard]
+aioboto3==15.5.0
+fastapi==0.128.0
+loguru==0.7.3
 pydantic>1
-aioboto3
+python-dotenv==1.2.1
+uvicorn[standard]==0.39.0
 pydantic-settings
