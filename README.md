@@ -91,14 +91,14 @@ Location:
 Deployment
 --------------------------
 
-Prerequisites:
+### Prerequisites:
 
   - Python 3.9+
   - AWS CLI configured
   - AWS CDK installed
   - Docker (for API container builds)
 
-Install dependencies:
+### Install dependencies:
 
   Creating a python environment - highly recommended, for more information: https://docs.python.org/3/library/venv.html
 
@@ -107,32 +107,37 @@ Install dependencies:
   pip install -r aws_cdk/requirements.txt #For the CDK Scripts
 
 
-Bootstrap CDK (once per account/region):
+### Bootstrap CDK (once per account/region):
 
   cdk bootstrap
 
-Modify cdk.json:
+### Modify cdk.json:
 
 cdk.json includes an aws profile spec, can remove it if your keys are stored in the default profile, otherwise, don't forget to change the profile name.
+
 can also use aws configure `--profile <PROFILENAME>` to create a new profile, if needed.
 
 Example cdk.json:
+```json
 {
   "app": "py app.py",
   "profile": "vi"
 }
+```
 
-Create and populate the data folder:
+### Create and populate the data folder:
+
 LOCAL_INPUT_DATA variable at the top of aws_cdk/app.py pre-defines a relative path to a data folder.
+
 Feel free to modify the path or use the same one, then copy the sample/input data (stocks_data.csv in this case)
 
-Deploy stacks
+### Deploy stacks
 
-Deploy both stacks:
+#### Deploy both stacks:
 
   cdk deploy --all
 
-Or deploy individually:
+#### Or deploy individually:
 
   cdk deploy StockAnalyticsDataPipelineStack
 
@@ -149,7 +154,15 @@ Run FastAPI locally:
 
   uvicorn main:app --reload
 
-- Java SDK 17+ for PySpark 4.0.1 or else the session creation hangs
+  dont forget to setup both environment variables
+  ```
+  ATHENA_DATABASE=assignment-ben
+  ATHENA_OUTPUT_LOCATION=s3://data-assignment-ben-dadon/athena_results/
+  ```
+
+  for an easier time loading the variables, use ```python-dotenv``` https://pypi.org/project/python-dotenv/
+
+- If you want to debug a spark session locally, make sure you have Java SDK 17+ (for PySpark 4.0.1) or else the session creation hangs
 
 --------------------------
 Usage
