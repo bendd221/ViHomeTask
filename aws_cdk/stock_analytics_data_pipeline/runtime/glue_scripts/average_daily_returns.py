@@ -2,7 +2,6 @@ import sys
 from awsglue.utils import getResolvedOptions
 from awsglue.context import GlueContext
 from pyspark.context import SparkContext
-
 from pyspark.sql.functions import col, avg, lag, round
 from pyspark.sql import Window
 
@@ -15,11 +14,17 @@ sc = SparkContext()
 glueContext = GlueContext(sc)
 spark = glueContext.spark_session
 
+logger = glueContext.get_logger()
+logger.info(f"Job {args['JOB_NAME']} started")
+logger.info(f"Input path: {input_path}, Output path: {output_path}, Database: {database_name}")
+
 def load_and_preprocess(spark_session, input_path):
+    logger.info("Loading input CSV")
     df = spark_session.read \
-    .option("header", "true") \
-    .option("inferSchema", "true") \
-    .csv(input_path)
+        .option("header", "true") \
+        .option("inferSchema", "true") \
+        .csv(input_path)
+    logger.info(f"Loaded {df.count()} rows")
     return df
 
 df = load_and_preprocess(spark, input_path)
@@ -32,7 +37,9 @@ df_returns = df.withColumn(
 ).withColumn(
     "daily_return", 
     (col("close") / col("lag_close")) - 1
-).dropna() 
+).dropna()
+
+logger.info("Calculated daily returns")
 
 final_df = df_returns.groupBy("Date").agg(
     round(avg("daily_return") * 100, 4).alias("average_return")
@@ -41,9 +48,14 @@ final_df = df_returns.groupBy("Date").agg(
     "average_return"
 )
 
+logger.info("Aggregated average daily return")
+
 final_df.write \
     .mode("overwrite") \
     .format("parquet") \
     .partitionBy("date") \
     .option("path", output_path) \
     .saveAsTable(f"{database_name}.average_daily_return")
+
+logger.info(f"Data written to {database_name}.average_daily_return")
+logger.info(f"Job {args['JOB_NAME']} completed successfully")

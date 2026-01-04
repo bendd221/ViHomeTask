@@ -1,6 +1,5 @@
-📈 Stock Analytics Platform (AWS CDK + FastAPI)
+# 📈 Stock Analytics Platform (AWS CDK + FastAPI)
 
-==========================
 Overview
 ==========================
 
@@ -98,7 +97,6 @@ Prerequisites:
   - AWS CLI configured
   - AWS CDK installed
   - Docker (for API container builds)
-  - Java 17+ for PySpark 4.0.1
 
 Install dependencies:
 
@@ -118,6 +116,7 @@ Deploy both stacks:
 Or deploy individually:
 
   cdk deploy StockAnalyticsDataPipelineStack
+
   cdk deploy StockAnalyticsApiStack
 
 --------------------------
@@ -127,8 +126,10 @@ Local Development
 Run FastAPI locally:
 
   cd api/app
+
   uvicorn main:app --reload
 
+- Java SDK 17+ for PySpark 4.0.1 or else the session creation hangs
 --------------------------
 Configuration
 --------------------------
@@ -144,22 +145,31 @@ Usage
 After deploying the CDK, you should see the following message with the load balancer's endpoint:
 
   Outputs:
+
+  ```
   StockAnalyticsAPIStack.LoadBalancerDNS = StockA-Stock-myexample-test.eu-central-1.elb.amazonaws.com
   StockAnalyticsAPIStack.StocksAnalyticsApiLoadBalancerDNSF698D36A = StockA-Stock-myexample-test.eu-central-1.elb.amazonaws.com
   StockAnalyticsAPIStack.StocksAnalyticsApiServiceURL6F11E8A2 = http://StockA-Stock-myexample-test.eu-central-1.elb.amazonaws.com
   Stack ARN:
-  arn:aws:cloudformation:eu-central-1:851725552187:stack/StockAnalyticsAPIStack/7c58aa30-e901-11f0-acd2-0aa6a2f17871
+  arn:aws:cloudformation:eu-central-1:myaccount:stack/StockAnalyticsAPIStack/irrelevnant
+  ```
 
 Use the DNS to send api requests for data:
 
+```python
   import requests
   results = requests.get(http://StockA-Stock-myexample-test.eu-central-1.elb.amazonaws.com/metrics/most-valuable-day)
-
+  results.content
+  #or whatever you want to do
+```
 Available endpoints:
 
   /most-valueble-day
+
   /most-volatile
+
   /average-daily-return
+
   /health
 
 --------------------------
@@ -179,3 +189,4 @@ Future Improvements
 
   - Tests (Didn't have time and would rather not just blindly generate them with AI)
   - Improve observability (logs, metrics are lacking here)
+  - Boilerplate code of glue job scripts into a separate module (--additional-python-modules)
