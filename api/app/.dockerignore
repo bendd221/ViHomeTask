@@ -1,0 +1,12 @@
+**/__pycache__/
+**/*.pyc
+**/*.pyo
+**/*.pyd
+.venv/
+.env
+.git/
+.gitignore
+cdk.out/
+node_modules/
+dist/
+build/
