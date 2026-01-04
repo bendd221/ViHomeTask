@@ -6,7 +6,7 @@ router = APIRouter(prefix="/metrics")
 athena_service = AsyncAthenaService()
 
 
-@router.get("/average-daily-return")
+@router.get("/daily-average-return")
 async def daily_average_return(
     from_date: str = Query(..., pattern=r"^\d{4}-\d{2}-\d{2}$"),
     to_date: str = Query(..., pattern=r"^\d{4}-\d{2}-\d{2}$")
@@ -19,7 +19,7 @@ async def daily_average_return(
     SELECT
         date,
         average_return
-    FROM average_daily_returns
+    FROM average_daily_return
     WHERE date BETWEEN DATE '{from_date}' AND DATE '{to_date}'
     ORDER BY date ASC
     """

@@ -101,6 +101,7 @@ Prerequisites:
 Install dependencies:
 
   pip install -r api/app/requirements.txt #For the application itself
+
   pip install -r aws_cdk/requirements.txt #For the CDK Scripts
 
 Bootstrap CDK (once per account/region):
@@ -119,6 +120,14 @@ Or deploy individually:
 
   cdk deploy StockAnalyticsApiStack
 
+cdk.json includes an aws profile spec, can remove it if your keys are stored in the default profile, otherwise, don't forget to change the profile name.
+can also use aws configure `--profile <PROFILENAME>` to create a new profile, if needed.
+
+Example cdk.json:
+{
+  "app": "py app.py",
+  "profile": "vi"
+}
 --------------------------
 Local Development
 --------------------------
@@ -168,7 +177,7 @@ Available endpoints:
 
   /most-volatile
 
-  /average-daily-return
+  /average-daily-return?from_date=YYYY-MM-DD&to_date=YYYY-MM-DD 
 
   /health
 
@@ -178,10 +187,11 @@ Notes
 
   - Infrastructure and application code are intentionally separated.
   - Glue jobs are currently split into three but the I/O Concern is something I had in mind, so one glue job that does all three might be the correct approach depending on the demand (Time, Scalability, Organization etc)
-  - Schemas are currently being defined manually, but we can use partition projection to pre-determine the tables.
-  - Annualize Volatility is one of the column names, but the task itself required data from all years, was that a mistake on the task itself?
+  - Schemas are currently being defined through the script of each glue job, but we can use partition projection to pre-determine the tables to keep it clear in the CDK.
+  - I used Hive tables, but with a bit of code modification to the scripts and a different parameter, we can easily change to an Iceberg table
+  - Annualize Volatility is one of the column names, but the task itself required data from all years, was this a mistake?
   - AWS Lambda was a consideration at first (for the API) but I have decided to go with ECS as Lambda has a 15 minutes response timeout, and if the data scales more it might become a problem at one point.
-  - One of the results have a single line it in, and Athenas has a minimum pay per request, so even if something is being queried for a single byte it will still charge for a lot more, maybe there's a better solution to that?
+  - One of the results have a single line it in, and Athena has a minimum pay-per-request of 10MB, so even a single byte of result will charge for the full 10MB, maybe there's a better solution to that?
 
 --------------------------
 Future Improvements
