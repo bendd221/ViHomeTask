@@ -188,9 +188,9 @@ Use the DNS url to send api requests:
   results.content
   #or whatever you want to do
 ```
-Available endpoints:
+### Available endpoints:
 
-  /most-valueble-day
+  /most-valuable-day
 
   /most-volatile
 
