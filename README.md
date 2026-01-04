@@ -181,7 +181,7 @@ Available endpoints:
 
   /most-volatile
 
-  /average-daily-return?from_date=YYYY-MM-DD&to_date=YYYY-MM-DD 
+  /daily-average-return?from_date=YYYY-MM-DD&to_date=YYYY-MM-DD 
 
   /health (here for health checks by the load balancer)
 
