@@ -199,16 +199,16 @@ Available endpoints:
   /health (here for health checks by the load balancer)
 
 --------------------------
-Notes
+Notes and Thoughts
 --------------------------
 
   - Infrastructure and application code are intentionally separated.
-  - Glue jobs are currently split into three but the I/O Concern is something I had in mind, so one glue job that does all three might be the correct approach depending on the demand (Time, Scalability, Organization etc)
-  - Schemas are currently being defined through the script of each glue job, but we can use partition projection to pre-determine the tables to keep it clear in the CDK.
+  - Glue jobs are currently split into three but the I/O Concern is something I had in mind, so one glue job that does all three might be the correct approach depending on the demand (Time, Scalability, Organization etc) It should still be simple enough to modify the process into a single-job-multi-transformations kind of process, just change the job config to have one single Job and create a script that combines all three, and thats it.
+  - Schemas are currently being defined through the script of each glue job, but we can also use partition projection if we know the csv structure just to keep it more contained in the CDK Code.
   - I used Hive tables, but with a bit of code modification to the scripts and a different parameter, we can easily change to an Iceberg table
   - Annualize Volatility is one of the column names, but the task itself required data from all years, was this a mistake?
   - AWS Lambda was a consideration at first (for the API) but I have decided to go with ECS as Lambda has a 15 minutes response timeout, and if the data scales more it might become a problem at one point.
-  - One of the results have a single line it in, and Athena has a minimum pay-per-request of 10MB, so even a single byte of result will charge for the full 10MB, maybe there's a better solution to that?
+  - One of the endpoints requested had a single line in it (defined in the home task) and Athena has a minimum pay-per-request of 10MB, so even a single byte of result will charge for the full 10MB, maybe there's a better solution for that?
 
 --------------------------
 Future Improvements
